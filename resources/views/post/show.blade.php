@@ -1,7 +1,7 @@
 @extends ('base')
 
 @section('content')
-{!! $post->texto !!}
+{!! strip_tags($post->texto , env('PERMITTED_TAGS')) !!}
 @endsection
 
 @section('titulo')

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -12,7 +13,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts= Post::orderBy('id', 'desc')->get();
+        $posts = Post::orderBy('id', 'desc')->get();
         return view('post.index', ['posts' => $posts]);
     }
 
@@ -21,7 +22,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        return view('post.create');
     }
 
     /**
@@ -29,7 +30,19 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'enter'   =>  'required|min:60|max:250|unique:post',
+            'text'     =>  'required|min:100',
+            'title'    => 'required|min:25|max:60|unique:post',
+        ]);
+        $post = new Post($request->all());
+        $post->text = strip_tags($post->text, env('PERMITTED_TAGS'));
+        try {
+            $post->save();
+            return redirect('/')->with('message', 'Post created successfully.');
+        } catch (\Exception $e) {
+            return back()->withInput()->withErrors(['error' => 'Post could not be created.']);
+        }
     }
 
     /**
@@ -37,7 +50,8 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        return view('post.show', ['post' => $post]);
+        $permittedTags = env('PERMITTED_TAGS');
+        return view('post.show', ['post' => $post, 'permittedTags' => $permittedTags]);
     }
 
     /**
@@ -45,7 +59,7 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        return view('post.edit', compact('post'));
     }
 
     /**
@@ -53,7 +67,18 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+        $validatedData = $request->validate([
+            'title' => 'required|max:255',
+            'body' => 'required',
+        ]);
+
+        try {
+            $post->update($validatedData);
+            return redirect()->route('posts.index')
+                             ->with('success', 'Post actualizado exitosamente.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'No se pudo actualizar el post.']);
+        }
     }
 
     /**
@@ -61,6 +86,12 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        try {
+            $post->delete();
+            return redirect()->route('posts.index')
+                             ->with('success', 'Post eliminado exitosamente.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'No se pudo eliminar el post.']);
+        }
     }
 }
