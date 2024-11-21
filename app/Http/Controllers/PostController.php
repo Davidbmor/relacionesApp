@@ -31,9 +31,9 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'enter'   =>  'required|min:60|max:250|unique:post',
-            'text'     =>  'required|min:100',
-            'title'    => 'required|min:25|max:60|unique:post',
+            'entrada'   =>  'required|min:60|max:250|unique:post',
+            'texto'     =>  'required|min:100',
+            'titulo'    => 'required|min:25|max:60|unique:post',
         ]);
         $post = new Post($request->all());
         $post->text = strip_tags($post->text, env('PERMITTED_TAGS'));
