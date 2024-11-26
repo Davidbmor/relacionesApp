@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+
 
 class CommentController extends Controller
 {
@@ -66,7 +68,12 @@ class CommentController extends Controller
      */
     public function edit(Comment $comment)
     {
-        //
+        // Verificar si está dentro de los primeros 10 minutos
+        if ($comment->created_at->diffInMinutes(Carbon::now()) > 10) {
+            return back()->withErrors(['error' => 'El comentario ya no se puede editar porque han pasado más de 10 minutos.']);
+        }
+
+        return view('comment.edit', compact('comment'));
     }
 
     /**
@@ -74,7 +81,25 @@ class CommentController extends Controller
      */
     public function update(Request $request, Comment $comment)
     {
-        //
+        
+         // Validar el correo proporcionado
+    $request->validate([
+        'correo' => 'required|email',
+        'texto' => 'required|min:10|max:1000',
+    ]);
+
+        if ($request->correo !== $comment->correo) {
+            return back()->withErrors(['message' => 'El correo proporcionado no coincide con el del comentario.']);
+        }
+
+        try {
+            $comment->texto = $request->texto;
+            $comment->save();
+
+            return redirect()->route('post.show', $comment->post_id)->with('message', 'Comentario actualizado con éxito.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['message' => 'No se pudo actualizar el comentario.']);
+        }
     }
 
     /**

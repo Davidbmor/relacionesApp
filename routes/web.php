@@ -10,3 +10,6 @@ Route::get('/', [PostController::class, 'index'])->name('post.index');
 Route::resource('post', PostController::class);
 Route::post('post/{post}/comment',[PostController::class, 'storeComment'])->name('post.comment');
 Route::resource('comment', CommentController::class);
+Route::get('comment/{comment}/edit', [CommentController::class, 'edit'])->name('comment.edit');
+Route::put('comment/{comment}', [CommentController::class, 'update'])->name('comment.update');
+

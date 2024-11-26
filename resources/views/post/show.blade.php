@@ -5,21 +5,23 @@
 <hr>
 
 @foreach($post->comments as $comment)
-
-
     <div class="card">
         <div class="card-body">
-             {{ $comment->texto }}
+            {{ $comment->texto }}
         </div>
-   
-    <br>
-    <div class="card-footer text-muted text-end" >
-    {{ $comment->apodo }} , {{ $comment->created_at->locale('es')->isoFormat('hh:mm dddd D \d\e MMMM \d\e\l Y') }}
-    </div>
 
+        <br>
+        <div class="card-footer text-muted text-end">
+            {{ $comment->apodo }}, {{ $comment->created_at->locale('es')->isoFormat('hh:mm dddd D \d\e MMMM \d\e\l Y') }}
+            
+            {{-- Mostrar enlace de edición solo si es menor de 10 minutos --}}
+            @if(now()->diffInMinutes($comment->created_at) <= 10)
+                <a href="{{ route('comment.edit', $comment->id) }}" class="btn btn-link">Editar</a>
+            @endif
+        </div>
     </div>
-     
-    @endforeach
+@endforeach
+
 
 <hr>
 
