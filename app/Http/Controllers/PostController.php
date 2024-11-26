@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Comment;
 use App\Models\Post;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -31,18 +31,43 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            '_token',
             'entrada'   =>  'required|min:60|max:250|unique:post',
             'texto'     =>  'required|min:100',
             'titulo'    => 'required|min:25|max:60|unique:post',
         ]);
-        $post = new Post($request->all());
-        $post->text = strip_tags($post->text, env('PERMITTED_TAGS'));
+        $post = new Post();
+        $post->fill($request->all());
+        $post->texto = strip_tags($request->texto, env('PERMITTED_TAGS'));
         try {
             $post->save();
             return redirect('/')->with('message', 'Post created successfully.');
         } catch (\Exception $e) {
             return back()->withInput()->withErrors(['error' => 'Post could not be created.']);
         }
+    }
+
+
+
+    function storeComment(Request $request , Post $post) {
+        
+        $request->validate([
+            'apodo' => 'required|min:5|max:40',
+            'correo' => 'required|min:5|max:100',
+            'texto' => 'required|max:100',
+            
+            
+        ]);
+
+
+         $comment = new Comment($request->all());
+         $comment->post_id = $post->id;
+         try{
+            $comment->save();
+            return back()->with('message', 'Comentario creado exitosamente');
+         }catch(\Exception $e){
+            return back()->withInput()->withErrors(['message' => 'Comentario no creado']);
+         }
     }
 
     /**

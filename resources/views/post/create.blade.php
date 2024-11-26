@@ -40,7 +40,7 @@
 
     <div class="mb-3">
         <label for="texto" class="form-label">Texto</label>
-        <textarea class="form-control" id="texto" required name="texto"  minlength="100">{{ old('texto') }}</textarea>
+        <textarea class="form-control" id="texto" required minlength="100" name="texto" > {{ old('texto') }}</textarea>
     </div>
     <hr>
     <div class="mb-3 float-end">

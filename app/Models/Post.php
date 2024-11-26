@@ -8,10 +8,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Post extends Model
 {
     protected $table = 'post';
-    protected $filable = ['entrada', 'texto', 'titulo'];
+    protected $fillable = ['titulo', 'entrada', 'texto'];
 
     public function comments(): HasMany
     {
-        return $this->hasMany(Comment::class , 'post_id');
+        return $this->hasMany(Comment::class);
     }
 }

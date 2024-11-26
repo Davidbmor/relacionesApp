@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
+use App\Models\Post;
 use Illuminate\Http\Request;
 
 class CommentController extends Controller
@@ -28,7 +29,28 @@ class CommentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $request->validate([
+            'apodo' => 'required|min:5|max:40',
+            'correo' => 'required|min:6|max:100',
+            'texto' => 'required|min:10',
+            
+            
+        ]);
+
+         $post_id = $request->post_id;
+         $post= Post::find($post_id);
+         if ($post == null) {
+             abort(404);
+         }
+
+         $comment = new Comment($request->all());
+         try{
+            $comment->save();
+            return back()->with('message', 'Comentario creado exitosamente');
+         }catch(\Exception $e){
+            return back()->withInput()->withErrors(['message' => 'Comentario no creado']);
+         }
     }
 
     /**
